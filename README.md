@@ -1,4 +1,4 @@
-# Kubernetes Phishing Lab Project
+# Kubernetes Phishing App Project
 A Kubernetes lab implementation that mimics a phishing workflow — a fake login page, a Flask collector backend, and a persistent MySQL database, all running inside a dedicated namespace.
 This repository demonstrates namespace-scoped application deployment using Nginx, Flask, MySQL, node taints/tolerations/affinity, RBAC, NetworkPolicies, Ingress, and cluster resource governance.
 
@@ -145,7 +145,6 @@ File: `deployments/mysql-secret.yaml`, namespace `project`. Fields: `MYSQL_ROOT_
 
 This last policy is what lets the frontend's `git-init-container` reach out and clone the repo despite the default-deny policy, without opening broader internet access to the pod. It requires the **Cilium CNI** — plain `NetworkPolicy` can't match egress by FQDN.
  
----
  
 ---
 
