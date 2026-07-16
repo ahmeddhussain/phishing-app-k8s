@@ -1,0 +1,70 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: project-role
+  namespace: project
+rules:
+  - apiGroups: [""]
+    resources:
+    - services
+    - secrets
+    - persistentvolumeclaims
+    - pods
+    - configmaps
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+
+  - apiGroups: ["apps"]
+    resources:
+    - deployments
+    - statefulsets
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+    - ingresses
+    - networkpolicies
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+
+  - apiGroups: ["autoscaling"]
+    resources:
+    - horizontalpodautoscalers
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+  - apiGroups: ["cilium.io"]
+    resources:
+    - ciliumnetworkpolicies
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete

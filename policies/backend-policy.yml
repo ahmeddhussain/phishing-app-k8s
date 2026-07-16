@@ -1,0 +1,48 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-policy
+  namespace: project
+spec:
+  podSelector:
+    matchLabels:
+      app: phishing-back
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    # Allow connection to the MySQL database on port 3306
+    - to:
+        - podSelector:
+            matchLabels:
+              app: phishing-db
+      ports:
+        - port: 3306
+
+    # Allow DNS resolution (UDP/TCP 53) to the kube-system namespace
+    - to:
+        - namespaceSelector: {} 
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+  ingress:
+    # Allow the frontend pod to connect on port 5000
+    - from:
+        - podSelector:
+            matchLabels:
+              app: phishing-front
+      ports:
+        - port: 5000
+
+    # Allow the Ingress Controller to connect on port 5000
+    - from:
+        - namespaceSelector: {} 
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+      ports:
+        - protocol: TCP
+          port: 5000 

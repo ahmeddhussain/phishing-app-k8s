@@ -1,0 +1,55 @@
+# db-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: phishing-db 
+  namespace: project               
+spec:
+  serviceName: db-svc                 
+  replicas: 1                        
+  selector:
+    matchLabels:
+      app: phishing-db
+  template:
+    metadata:
+      labels:
+        app: phishing-db                 
+    spec:
+      tolerations:
+      - key: "project"
+        operator: "Equal"
+        value: "phishing"
+        effect: "NoSchedule"
+
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: "project"
+                operator: "In"
+                values:
+                - phishing
+
+      containers:
+      - name: mysql-container
+        image: mysql:8.0
+        imagePullPolicy: Always               
+        ports:
+        - containerPort: 3306
+        envFrom:
+        - secretRef:
+            name: mysql-secret
+        volumeMounts:
+        - name: mysql-pvc
+          mountPath: /var/lib/mysql 
+
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-pvc             
+    spec:
+      storageClassName: phishing-db-storageclass 
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 200Mi             

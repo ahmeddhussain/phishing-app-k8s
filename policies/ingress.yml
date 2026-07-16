@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: phishing-ingress
+  namespace: project
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: phishing.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: phishing-front  
+            port:
+              number: 80
+      - path: /submit
+        pathType: Prefix
+        backend:
+          service:
+            name: phishing-back
+            port:
+             number: 5000

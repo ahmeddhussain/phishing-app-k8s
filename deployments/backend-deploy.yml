@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phishing-back
+  namespace: project   
+spec:
+  replicas: 2     
+  selector:
+    matchLabels:                   
+      app: phishing-back
+  template:                        
+    metadata:
+      labels:        
+        app: phishing-back
+    spec:
+      tolerations:
+      - key: "project"
+        operator: "Equal"           
+        value: "phishing"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:       
+            - matchExpressions:      
+              - key: "project" 
+                operator: "In"       
+                values:
+                - phishing
+      initContainers:
+      - name: dns-init-container
+        image: busybox
+        command: ["sh","-c"]
+        args: ['until nslookup phishing-db-0.db-svc.project.svc.cluster.local; do echo there is a problem; sleep 5; done']
+      containers:
+      - name: phishing-back
+        image: ahmedkhater2611/backend-k8s-project:latest 
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000  
+        envFrom:
+        - secretRef:
+            name: mysql-secret
+        volumeMounts:
+        - name: backend-pvc
+          mountPath: /app/uploads  #just to test pv,pvc setup. 
+      volumes:
+      - name: backend-pvc
+        persistentVolumeClaim:
+          claimName: backend-pvc

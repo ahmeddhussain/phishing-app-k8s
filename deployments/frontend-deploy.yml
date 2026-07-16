@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phishing-front
+  namespace: project 
+spec:
+  replicas: 2     
+  selector:
+    matchLabels:                   
+      app: phishing-front
+  template:                        
+    metadata:
+      labels:        
+        app: phishing-front
+    spec:
+      tolerations:
+      - key: "project"
+        operator: "Equal"           
+        value: "phishing"
+        effect: "NoSchedule"
+
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:       
+            - matchExpressions:      
+              - key: "project" 
+                operator: "In"       
+                values:
+                - phishing
+
+      initContainers:
+      - name: git-init-container
+        image: alpine/git
+        command: ["sh","-c"]
+        args: ['git clone https://github.com/ahmeddhussain/frontend-k8s-project.git /tmp/repo && cp -r /tmp/repo/html/* /html/']
+        volumeMounts:
+        - name: git-shared-volume
+          mountPath: /html
+      - name: dns-init-container
+        image: busybox
+        command: ["sh","-c"]
+        args: ['until nslookup phishing-back.project.svc.cluster.local; do echo there is a problem; sleep 5; done']
+
+      containers:
+      - name: phishing-front
+        image: nginx
+        ports:
+        - containerPort: 80          
+        volumeMounts:
+        - name: git-shared-volume
+          mountPath: /usr/share/nginx/html/
+
+      volumes:
+      - name: git-shared-volume
+        emptyDir: {}

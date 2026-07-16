@@ -1,0 +1,13 @@
+# db-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-svc                    
+  namespace: project                
+spec:
+  clusterIP: None                    
+  selector:
+    app: phishing-db                   
+  ports:
+  - port: 3306                      
+    targetPort: 3306                 

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: phishing-front
+  namespace: project
+spec:
+  selector:
+    app: phishing-front
+  ports:
+  - port: 80
+    targetPort: 80
+
